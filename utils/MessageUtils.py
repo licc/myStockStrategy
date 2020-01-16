@@ -26,6 +26,7 @@ class MessageUtils:
     def get_messages(state, sendorrecv):
         session = DbUtils.get_session()
         list = session.query(Message).filter_by(state=state, sendorrecv=sendorrecv).all()
+        session.close()
         return list
 
 

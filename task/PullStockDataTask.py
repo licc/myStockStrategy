@@ -82,8 +82,8 @@ def get_stock_data(stockNo, startDate, endDate):
 
 
 def main():
-    # pull_stock_cal("20190116", "20200116")
-    pull_stock_data()
+    pull_stock_cal("20200116", "20200116")
+    # pull_stock_data()
 
 
 if __name__ == "__main__": main()
