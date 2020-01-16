@@ -64,7 +64,7 @@ def thread_handle_message():
 
 
 def process_message(wx_inst):
-    # 查询未处理的接收消息
+    # 查询下行未处理的接收消息
     msglist = MessageUtils.get_messages(0, 1)
     for msg in msglist:
         try:

@@ -84,6 +84,7 @@ def process_job(job):
                 s_d_data['ma20'] = []
             s_d_data['ma20'].append(row[12])
 
+        data["name"] = job.name
         img_path = HtmlUtils.generate_img(
             HtmlUtils.generate_html("./static/template", 'ktemp.html', data))
 

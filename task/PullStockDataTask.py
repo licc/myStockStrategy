@@ -1,11 +1,15 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import datetime
+import json
 import logging
 
 import tushare as ts
 
+from model.Message import Message
+from utils import Config
 from utils.DbUtils import DbUtils
+from utils.MessageUtils import MessageUtils
 from utils.ModelUtils import ModelUtils
 
 logging.basicConfig(level=logging.INFO)
@@ -51,6 +55,14 @@ def pull_stock_data():
     session.close()
     for row in rows:
         get_stock_data(row.code, sdate, edate)
+
+    send_d = {"data": "当日数据拉取成功！！！", "type": "text"}
+    MessageUtils.add_message(
+        Message(fromid=Config.mywx_id, fromname=Config.mywx_nickname,
+                toid=Config.mychatroom_id, toname=""
+                , content=json.dumps(send_d), creattime=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                , state=0, sendorrecv=1, msgtype="msg::chatroom")
+    )
 
 
 def pull_stock_cal(sdate, edate):

@@ -5,6 +5,7 @@ import time
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from task import MessageTask, PullStockDataTask, StockAnalyzeTask
+from utils import Config
 from utils.SystemUtils import SystemUtils
 
 if SystemUtils.is_windows():
@@ -27,7 +28,7 @@ def win_run():
     threading.Thread(target=MessageTask.thread_handle_message).start()
     print("监听消息启动完成")
 
-    wx_inst.send_text(to_user='18820507799@chatroom', msg='老师来了！！！！')
+    wx_inst.send_text(to_user=Config.mychatroom_id, msg=Config.login_msg)
     return wx_inst
 
 
@@ -40,7 +41,7 @@ if __name__ == '__main__':
         wx_inst = win_run()
 
     # 周一拉取全量的表数据
-    scheduler.add_job(PullStockDataTask.pull_stock_list, 'cron', day_of_week='mon', hour=8, minute=10)
+    scheduler.add_job(PullStockDataTask.pull_stock_list, 'cron', day_of_week='mon', hour=7, minute=10)
 
     # 工作日每天获取一次
     scheduler.add_job(PullStockDataTask.pull_stock_data, 'cron', day_of_week='mon-fri', hour=16, minute=10)
