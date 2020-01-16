@@ -96,5 +96,4 @@ def process_job(job):
         )
 
     except BaseException as e:
-        logging.error('处理单个任务失败:name:' + job.name, e.msg)
-
+        logging.error('处理单个任务失败:name:' + job.name, e)

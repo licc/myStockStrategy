@@ -2,7 +2,6 @@
 # -*- coding: UTF-8 -*-
 import json
 import logging
-import time
 from datetime import datetime
 from queue import Queue
 
@@ -61,7 +60,7 @@ def thread_handle_message():
                         msgobj.toname = fromname
                 MessageUtils.add_message(msgobj)
         except BaseException as e:
-            logging.error('error 信息', e.msg)
+            logging.error('error 信息', e)
 
 
 def process_message(wx_inst):
@@ -85,7 +84,7 @@ def process_message(wx_inst):
                     logging.info("发送内容为空：" + msg.content)
 
         except BaseException as e:
-            logging.error('处理 process_message:id:%s content:%s' % (msg.id, msg.content), e.msg)
+            logging.error('处理 process_message:id:%s content:%s' % (msg.id, msg.content), e)
 
 
 def main():

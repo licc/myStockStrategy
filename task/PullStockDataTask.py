@@ -33,7 +33,7 @@ def pull_stock_list():
         count = df.shape[0]
 
     except BaseException as e:
-        logging.error('数据保存失败-总条数:%s' % (count) + " msg:", e.msg)
+        logging.error('数据保存失败-总条数:%s' % (count), e)
     else:
         logging.info('数据保存成功-总条数:%s' % (count))
 
@@ -66,12 +66,12 @@ def get_stock_data(stockNo, startDate, endDate):
         df.insert(0, 'code', stockNo)
         df.to_sql('tick_data', DbUtils.get_engine(), if_exists='append')
     except BaseException as e:
-        logging.error('数据保存失败:stockNo:%s startDate:%s endDate:%s' % (stockNo, startDate, endDate) + " msg:", e.msg)
+        logging.error('数据保存失败:stockNo:%s startDate:%s endDate:%s ' % (stockNo, startDate, endDate), e)
 
 
 def main():
-    pull_stock_cal("20190116", "20200116")
-    # pull_stock_data()
+    # pull_stock_cal("20190116", "20200116")
+    pull_stock_data()
 
 
 if __name__ == "__main__": main()

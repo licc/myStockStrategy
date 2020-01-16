@@ -43,7 +43,7 @@ if __name__ == '__main__':
     scheduler.add_job(PullStockDataTask.pull_stock_list, 'cron', day_of_week='mon', hour=8, minute=10)
 
     # 工作日每天获取一次
-    scheduler.add_job(PullStockDataTask.pull_stock_data, 'cron', day_of_week='mon-fri', hour=15, minute=10)
+    scheduler.add_job(PullStockDataTask.pull_stock_data, 'cron', day_of_week='mon-fri', hour=16, minute=10)
 
     # 每两秒处理一次消息
     scheduler.add_job(MessageTask.process_message, 'interval', seconds=2, max_instances=1, args=[wx_inst])
