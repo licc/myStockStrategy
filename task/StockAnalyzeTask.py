@@ -98,3 +98,15 @@ def process_job(job):
 
     except BaseException as e:
         logging.error('处理单个任务失败:name:' + job.name, e)
+
+
+def main():
+    print( CronTrigger.from_crontab("40 4 * * 1-5"))
+
+
+
+
+
+
+if __name__ == "__main__": main()
+
