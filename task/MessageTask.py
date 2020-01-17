@@ -76,7 +76,7 @@ def process_message(wx_inst):
 
 
 def __process_mo_message(wx_inst):
-    msglist = MessageUtils.get_messages(0, 0, (datetime.now() + timedelta(minutes=-200)))
+    msglist = MessageUtils.get_messages(0, 0, (datetime.now() + timedelta(minutes=-20)))
     for msg in msglist:
         try:
             MessageUtils.update_message_state(msg.id, 1)
