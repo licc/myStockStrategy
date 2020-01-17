@@ -137,7 +137,7 @@ def __process_mt_message(wx_inst):
                         logging.info("发送图片：%s aimg:%s" % (content['data'], aimg))
                         wx_inst.send_img(to_user=msg.toid, img_abspath=(r"" + aimg))
                     elif content['type'] == "text":
-                        logging.info("发送文字：%s" % content['data'])
+                        # logging.info("发送文字：%s" % content['data'])
                         wx_inst.send_text(to_user=msg.toid, msg=content['data'])
                 else:
                     logging.info("发送内容为空：" + msg.content)
