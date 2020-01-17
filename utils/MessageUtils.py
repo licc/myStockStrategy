@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import json
+from datetime import datetime
+
+from sqlalchemy import text
 
 from model.Message import Message
 from utils.DbUtils import DbUtils
@@ -18,7 +21,7 @@ class MessageUtils:
     @staticmethod
     def update_message_state(id, state):
         session = DbUtils.get_session()
-        session.query(Message).filter_by(id=id).update({"state": state})
+        session.query(Message).filter_by(id=id).update({"state": state, "updatetime": datetime.now()})
         session.close()
         # session.commit()
 
@@ -26,8 +29,9 @@ class MessageUtils:
     def get_messages(state, sendorrecv, createtime):
         session = DbUtils.get_session()
 
-        list = session.query(Message).filter(createtime > createtime).filter_by(state=state,
-                                                                                sendorrecv=sendorrecv).all()
+        list = session.query(Message).filter_by(state=state, sendorrecv=sendorrecv) \
+            .filter(text("create_time>'" + createtime.strftime('%Y-%m-%d %H:%M:%S') + "'")) \
+            .all()
 
         session.close()
         return list

@@ -16,6 +16,7 @@ class Message(Base):
     toid = Column(String, name="to_id")
     toname = Column(String, name="to_name")
     content = Column(String)
+    updatetime = Column(TIMESTAMP, name="update_time")
     createtime = Column(TIMESTAMP, name="create_time")
     state = Column(Integer)
     sendorrecv = Column(Integer, name="send_or_recv")

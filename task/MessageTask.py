@@ -72,20 +72,20 @@ def process_message(wx_inst):
     # 处理下行消息
     __process_mt_message(wx_inst)
     # 处理上行消息
-    # __process_mo_message(wx_inst)
+    __process_mo_message(wx_inst)
 
 
 def __process_mo_message(wx_inst):
-    msglist = MessageUtils.get_messages(0, 0, (datetime.now() + timedelta(minutes=-20)))
+    msglist = MessageUtils.get_messages(0, 0, (datetime.now() + timedelta(minutes=-200)))
     for msg in msglist:
         try:
-            # MessageUtils.update_message_state(msg.id, 1)
+            MessageUtils.update_message_state(msg.id, 1)
             print(msg)
             if len(msg.content) > 0 and msg.content[0] == "@":
                 strlist = msg.content.split('?')
                 if len(strlist) > 1:
-                    a_name = strlist[0]
-                    a_val = strlist[1]
+                    a_name = strlist[0].strip()
+                    a_val = strlist[1].strip()
                     if a_name == "@" + Config.mywx_nickname:
                         if a_val == "1":
                             session = DbUtils.get_session()
@@ -93,23 +93,21 @@ def __process_mo_message(wx_inst):
                                 .filter_by(createid=msg.frommemberwxid).all()
                             session.close()
                             for job in jbos:
-                                print("job============")
-                                # StockAnalyzeTask.process_job(job)
+                                StockAnalyzeTask.process_job(job)
 
                         elif a_name == "@" + Config.mywx_nickname:
                             res = tuling(a_val, msg.frommemberwxid)
                             if res["code"] == 200:
                                 reply = res["newslist"][0]["reply"]
                                 send_d = {"data": reply, "type": "text"}
-                                print("jqr============")
 
-                                # MessageUtils.add_message(
-                                #     Message(fromid=Config.mywx_id, fromname=Config.mywx_nickname,
-                                #             toid=msg.fromid, toname=""
-                                #             , content=json.dumps(send_d),
-                                #             creattime=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                                #             , state=0, sendorrecv=1, msgtype="msg::chatroom")
-                                # )
+                                MessageUtils.add_message(
+                                    Message(fromid=Config.mywx_id, fromname=Config.mywx_nickname,
+                                            toid=msg.fromid, toname=""
+                                            , content=json.dumps(send_d),
+                                            createtime=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                                            , state=0, sendorrecv=1, msgtype="msg::chatroom")
+                                )
 
         except BaseException as e:
             logging.error('处理 process_message:id:%s content:%s' % (msg.id, msg.content), e)
