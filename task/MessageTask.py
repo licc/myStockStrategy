@@ -38,7 +38,7 @@ def thread_handle_message():
                 msgobj.state = state
                 msgobj.content = content
                 msgobj.msgtype = message.get('type')
-                msgobj.frommemberwxid = message.get('data', {}).get('from_member_wxid', 'from_member_wxid')
+                msgobj.frommemberwxid = message.get('data', {}).get('from_member_wxid', '')
                 msgobj.creattime = datetime.strptime(message.get('data', {}).get('time', ''), '%Y-%m-%d %H:%M:%S')
                 msgobj.sendorrecv = 0 if send_or_recv[0] == '0' else 1
 
