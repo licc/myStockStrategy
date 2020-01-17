@@ -6,7 +6,7 @@
     <title>echarts</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <script src="../dist/echarts.js"></script>
     <script src="../dist/jquery.min.js"></script>
     <style>
@@ -15,42 +15,43 @@
             width: 100%;
             height: 300px;
         }
-        .sdiv{
+
+        .sdiv {
             width: 90%;
             height: 70%;
-            margin-bottom:100px;
-            margin-left:35px;
+            margin-bottom: 100px;
+            margin-left: 35px;
         }
     </style>
 </head>
 
 <body bgcolor="#21202D">
-    <div style="color: #ffffff;font-size: 32px;" id="taskname"></div>
-    <br>
+<div style="color: #ffffff;font-size: 32px;" id="taskname"></div>
+<br>
 
-    <script type="text/javascript">
-        setInterval(function () {
-            var maxHeight = $(document.body).outerHeight(true);
-            $(".sdiv").height(maxHeight/3);
-        }, 1)
+<script type="text/javascript">
+    setInterval(function () {
+        var maxHeight = $(document.body).outerHeight(true);
+        $(".sdiv").height(maxHeight / 3);
+    }, 1)
 
 
+    var rawData = eval('({{json_data}})')
+    $("#taskname").html(rawData.name)
 
-        var rawData = eval('({{json_data}})')
-        $("#taskname").html(rawData.name)
-
-        $.each(rawData, function(sno, item) {
-            var divstr='<div class="sdiv" id="'+sno+'"></div>'
+    $.each(rawData, function (sno, item) {
+        if (sno != undefined) {
+            var divstr = '<div class="sdiv" id="' + sno + '"></div>'
             $(document.body).append(divstr);
             var myChart = echarts.init(document.getElementById(sno));
 
             var option = {
                 title: {    //标题
-                    text: item.name+"("+sno+")",
+                    text: item.name + "(" + sno + ")",
                     left: 0,
-                    textStyle:{
+                    textStyle: {
                         //文字颜色
-                        color:'#ccc',
+                        color: '#ccc',
 
                     }
                 },
@@ -70,22 +71,22 @@
                 xAxis: {
                     type: 'category',
                     data: item.category,
-                    axisLine: { lineStyle: { color: '#8392A5' } }
+                    axisLine: {lineStyle: {color: '#8392A5'}}
                 },
                 yAxis: {
                     scale: true,
                     // interval:20, //值之间的间隔
-                    axisLine: { lineStyle: { color: '#8392A5' } },
-                    splitLine: { show: false }
+                    axisLine: {lineStyle: {color: '#8392A5'}},
+                    splitLine: {show: false}
                 },
                 grid: {
                     bottom: 80
                 },
                 dataZoom: [
                     {
-                        filterMode:'filter',    //当前数据窗口外的数据被过滤掉来达到数据窗口缩放的效果  默认值filter
+                        filterMode: 'filter',    //当前数据窗口外的数据被过滤掉来达到数据窗口缩放的效果  默认值filter
                         type: 'inside', //内置型数据区域缩放组件
-                        start: 50,      //数据窗口范围的起始百分比
+                        start: Math.min(50, Math.max( (1-(60/item.day.length))*100 ,0)),      //数据窗口范围的起始百分比
                         end: 100        //数据窗口范围的结束百分比
                     },
                     {
@@ -168,12 +169,11 @@
             };
 
             myChart.setOption(option);
-        });
+        }
+    });
 
 
-
-
-    </script>
+</script>
 </body>
 
 </html>
