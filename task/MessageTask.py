@@ -80,7 +80,6 @@ def __process_mo_message(wx_inst):
     for msg in msglist:
         try:
             MessageUtils.update_message_state(msg.id, 1)
-            print(msg)
             if len(msg.content) > 0 and msg.content[0] == "@":
                 strlist = msg.content.split('?')
                 if len(strlist) > 1:
