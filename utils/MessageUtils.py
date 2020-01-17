@@ -23,23 +23,21 @@ class MessageUtils:
         # session.commit()
 
     @staticmethod
-    def get_messages(state, sendorrecv):
+    def get_messages(state, sendorrecv, createtime):
         session = DbUtils.get_session()
-        list = session.query(Message).filter_by(state=state, sendorrecv=sendorrecv).all()
+
+        list = session.query(Message).filter(createtime > createtime).filter_by(state=state,
+                                                                                sendorrecv=sendorrecv).all()
+
         session.close()
         return list
-
 
 
 def main():
     msglist = MessageUtils.get_messages(0, 1)
     for row in msglist:
-        print("   ==%a"%row.id )
+        print("   ==%a" % row.id)
         print(row.content)
-
-
-
-
 
 
 if __name__ == "__main__": main()

@@ -60,7 +60,7 @@ def pull_stock_data():
     MessageUtils.add_message(
         Message(fromid=Config.mywx_id, fromname=Config.mywx_nickname,
                 toid=Config.mychatroom_id, toname=""
-                , content=json.dumps(send_d), creattime=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                , content=json.dumps(send_d), createtime=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 , state=0, sendorrecv=1, msgtype="msg::chatroom")
     )
 

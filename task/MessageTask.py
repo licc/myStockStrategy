@@ -2,12 +2,17 @@
 # -*- coding: UTF-8 -*-
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from queue import Queue
+import hashlib
+import requests
 
 from model.Message import Message
+from task import StockAnalyzeTask
 from utils import Config
+from utils.DbUtils import DbUtils
 from utils.MessageUtils import MessageUtils
+from utils.ModelUtils import ModelUtils
 from utils.SystemUtils import SystemUtils
 
 logging.basicConfig(level=logging.INFO)
@@ -39,7 +44,7 @@ def thread_handle_message():
                 msgobj.content = content
                 msgobj.msgtype = message.get('type')
                 msgobj.frommemberwxid = message.get('data', {}).get('from_member_wxid', '')
-                msgobj.creattime = datetime.strptime(message.get('data', {}).get('time', ''), '%Y-%m-%d %H:%M:%S')
+                msgobj.createtime = datetime.strptime(message.get('data', {}).get('time', ''), '%Y-%m-%d %H:%M:%S')
                 msgobj.sendorrecv = 0 if send_or_recv[0] == '0' else 1
 
                 if send_or_recv[0] == '1':
@@ -64,8 +69,63 @@ def thread_handle_message():
 
 
 def process_message(wx_inst):
+    # 处理下行消息
+    __process_mt_message(wx_inst)
+    # 处理上行消息
+    # __process_mo_message(wx_inst)
+
+
+def __process_mo_message(wx_inst):
+    msglist = MessageUtils.get_messages(0, 0, (datetime.now() + timedelta(minutes=-20)))
+    for msg in msglist:
+        try:
+            # MessageUtils.update_message_state(msg.id, 1)
+            print(msg)
+            if len(msg.content) > 0 and msg.content[0] == "@":
+                strlist = msg.content.split('?')
+                if len(strlist) > 1:
+                    a_name = strlist[0]
+                    a_val = strlist[1]
+                    if a_name == "@" + Config.mywx_nickname:
+                        if a_val == "1":
+                            session = DbUtils.get_session()
+                            jbos = session.query(ModelUtils.get_model("strategy_conf", DbUtils.get_engine())) \
+                                .filter_by(createid=msg.frommemberwxid).all()
+                            session.close()
+                            for job in jbos:
+                                print("job============")
+                                # StockAnalyzeTask.process_job(job)
+
+                        elif a_name == "@" + Config.mywx_nickname:
+                            res = tuling(a_val, msg.frommemberwxid)
+                            if res["code"] == 200:
+                                reply = res["newslist"][0]["reply"]
+                                send_d = {"data": reply, "type": "text"}
+                                print("jqr============")
+
+                                # MessageUtils.add_message(
+                                #     Message(fromid=Config.mywx_id, fromname=Config.mywx_nickname,
+                                #             toid=msg.fromid, toname=""
+                                #             , content=json.dumps(send_d),
+                                #             creattime=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                                #             , state=0, sendorrecv=1, msgtype="msg::chatroom")
+                                # )
+
+        except BaseException as e:
+            logging.error('处理 process_message:id:%s content:%s' % (msg.id, msg.content), e)
+
+
+# 调用图灵的机器人
+def tuling(text, id):
+    res = requests.get(
+        f"http://api.tianapi.com/txapi/robot/index?key={Config.tulin_apikey}&question={text}&userid={hashlib.md5(id.encode(encoding='UTF-8')).hexdigest()}")
+    res_json = res.json()
+    return res_json
+
+
+def __process_mt_message(wx_inst):
     # 查询下行未处理的接收消息
-    msglist = MessageUtils.get_messages(0, 1)
+    msglist = MessageUtils.get_messages(0, 1, (datetime.now() + timedelta(minutes=-20)))
     for msg in msglist:
         try:
             # time.sleep(1)
@@ -88,16 +148,11 @@ def process_message(wx_inst):
 
 
 def main():
-    dict = {'data': 'Runoob', 'Age': 7, 'Class': 'First'}
-    print(dict['data'])
-    content = json.loads('{"data": "33", "type": "img"}')
-
-    print(content['data'])
-
-    print(content.keys())
-
-    if "data" in content.keys():
-        print("33333333")
+    __process_mo_message("we23232")
+    # res = tuling("无聊", "dd")
+    # print(res)
+    # print(res["code"])
+    # print(res["newslist"][0]["reply"])
 
 
 if __name__ == "__main__": main()

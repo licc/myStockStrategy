@@ -2,5 +2,5 @@ mysql_url = 'mysql://stock:stock!123456@192.168.123.180:3306/stock_db?charset=ut
 mywx_id = 'wxid_3scuk17jccfn12'
 mywx_nickname = 'Aaaaa'
 mychatroom_id = '18820507799@chatroom'
-
+tulin_apikey='35cc37ef364f315bb501aefd1a41418f'
 login_msg = '老师来了！！！！'
