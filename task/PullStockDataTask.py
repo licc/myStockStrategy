@@ -48,7 +48,7 @@ def pull_stock_data():
     sdate = (datetime.datetime.now() + datetime.timedelta(days=-0)).strftime('%Y-%m-%d')
     edate = datetime.datetime.now().strftime('%Y-%m-%d')
 
-    pull_stock_cal(sdate, edate)
+    pull_stock_cal(datetime.datetime.now().strftime('%Y%m%d'), datetime.datetime.now().strftime('%Y%m%d'))
 
     session = DbUtils.get_session()
     rows = session.query(ModelUtils.get_model("tick_conf", DbUtils.get_engine())).all()
@@ -68,6 +68,7 @@ def pull_stock_data():
 def pull_stock_cal(sdate, edate):
     pro = ts.pro_api(token="cb077c8126fe4be0fb59e986f6a60146b5b40b65bb1a2d040675b7b8")
     df = pro.query('trade_cal', start_date=sdate, end_date=edate)
+    print(df)
     df.to_sql('trade_cal', DbUtils.get_engine(), if_exists='append')
 
 
@@ -75,14 +76,18 @@ def get_stock_data(stockNo, startDate, endDate):
     """获取指定code时间的票据信息"""
     try:
         df = ts.get_hist_data(stockNo, start=startDate, end=endDate)
-        df.insert(0, 'code', stockNo)
-        df.to_sql('tick_data', DbUtils.get_engine(), if_exists='append')
+        if not df.empty:
+            df.insert(0, 'code', stockNo)
+            df.to_sql('tick_data', DbUtils.get_engine(), if_exists='append')
     except BaseException as e:
         logging.error('数据保存失败:stockNo:%s startDate:%s endDate:%s ' % (stockNo, startDate, endDate), e)
 
 
 def main():
-    pull_stock_cal("20200116", "20200116")
+    pull_stock_cal("20200117", "20200117")
+    # get_stock_data("600187","20200116", "20200116")
+    # get_stock_data("20200116","20200116", "20200116")
+
     # pull_stock_data()
 
 
