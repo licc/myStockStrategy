@@ -15,7 +15,7 @@ from utils.MessageUtils import MessageUtils
 from utils.ModelUtils import ModelUtils
 from utils.SystemUtils import SystemUtils
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.ERROR)
 queue_recved_message = Queue()
 
 
@@ -108,6 +108,8 @@ def __process_mo_message(wx_inst):
                                             createtime=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                                             , state=0, sendorrecv=1, msgtype="msg::chatroom")
                                 )
+                            else:
+                                print(res)
 
         except BaseException as e:
             logging.error('处理 process_message:id:%s content:%s' % (msg.id, msg.content), e)
@@ -146,11 +148,11 @@ def __process_mt_message(wx_inst):
 
 
 def main():
-    __process_mo_message("we23232")
-    # res = tuling("无聊", "dd")
-    # print(res)
-    # print(res["code"])
-    # print(res["newslist"][0]["reply"])
+    # __process_mo_message("we23232")
+    res = tuling("大盘指数", "dd")
+    print(res)
+    print(res["code"])
+    print(res["newslist"][0]["reply"])
 
 
 if __name__ == "__main__": main()
