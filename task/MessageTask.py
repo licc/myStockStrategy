@@ -92,6 +92,7 @@ def __process_mo_message(wx_inst):
                                 .filter_by(createid=msg.frommemberwxid).all()
                             session.close()
                             for job in jbos:
+                                job.toid = msg.fromid
                                 StockAnalyzeTask.process_job(job)
 
                         elif a_name == "@" + Config.mywx_nickname:
