@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-import datetime
+import asyncio
+import datetime as datetime
 import json
 import logging
 
@@ -45,31 +46,34 @@ def pull_stock_list():
 def pull_stock_data():
     """拉取票据信息"""
     # 交易日历
-    sdate = (datetime.datetime.now() + datetime.timedelta(days=-0)).strftime('%Y-%m-%d')
-    edate = datetime.datetime.now().strftime('%Y-%m-%d')
+    sdate = (datetime.datetime.now() + datetime.timedelta(days=-0))
+    edate = datetime.datetime.now()
 
-    pull_stock_cal(datetime.datetime.now().strftime('%Y%m%d'), datetime.datetime.now().strftime('%Y%m%d'))
-
+    pull_stock_cal(sdate.strftime('%Y%m%d'), edate.strftime('%Y%m%d'))
     session = DbUtils.get_session()
     rows = session.query(ModelUtils.get_model("tick_conf", DbUtils.get_engine())).all()
     session.close()
     for row in rows:
-        get_stock_data(row.code, sdate, edate)
+        get_stock_data(row.code, sdate.strftime('%Y-%m-%d'), edate.strftime('%Y-%m-%d'))
 
-    send_d = {"data": "当日数据拉取成功！！！", "type": "text"}
-    MessageUtils.add_message(
-        Message(fromid=Config.mywx_id, fromname=Config.mywx_nickname,
-                toid=Config.mychatroom_id, toname=""
-                , content=json.dumps(send_d), createtime=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                , state=0, sendorrecv=1, msgtype="msg::chatroom")
-    )
+    else:
+        send_d = {"data": "当日数据拉取成功！！！", "type": "text"}
+        MessageUtils.add_message(
+            Message(fromid=Config.mywx_id, fromname=Config.mywx_nickname,
+                    toid=Config.mychatroom_id, toname=""
+                    , content=json.dumps(send_d), createtime=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    , state=0, sendorrecv=1, msgtype="msg::chatroom")
+        )
 
 
 def pull_stock_cal(sdate, edate):
-    pro = ts.pro_api(token="cb077c8126fe4be0fb59e986f6a60146b5b40b65bb1a2d040675b7b8")
-    df = pro.query('trade_cal', start_date=sdate, end_date=edate)
-    print(df)
-    df.to_sql('trade_cal', DbUtils.get_engine(), if_exists='append')
+    try:
+        pro = ts.pro_api(token="cb077c8126fe4be0fb59e986f6a60146b5b40b65bb1a2d040675b7b8")
+        df = pro.query('trade_cal', start_date=sdate, end_date=edate)
+        print(df)
+        df.to_sql('trade_cal', DbUtils.get_engine(), if_exists='append')
+    except BaseException as e:
+        logging.error('数据保存失败: startDate:%s endDate:%s ' % (sdate, edate), e)
 
 
 def get_stock_data(stockNo, startDate, endDate):
@@ -84,11 +88,11 @@ def get_stock_data(stockNo, startDate, endDate):
 
 
 def main():
-    pull_stock_cal("20200117", "20200117")
+    # pull_stock_cal("20200117", "20200117")
     # get_stock_data("600187","20200116", "20200116")
     # get_stock_data("20200116","20200116", "20200116")
 
-    # pull_stock_data()
+    pull_stock_data()
 
 
 if __name__ == "__main__": main()
