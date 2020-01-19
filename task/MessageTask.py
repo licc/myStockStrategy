@@ -89,28 +89,30 @@ def __process_mo_message(wx_inst):
                     a_val = strlist[0].strip()
                     if a_val == "1":
                         session = DbUtils.get_session()
-                        jbos = session.query(ModelUtils.get_model("strategy_conf", DbUtils.get_engine())) \
+                        jobs = session.query(ModelUtils.get_model("strategy_conf", DbUtils.get_engine())) \
                             .filter_by(createid=msg.frommemberwxid).all()
                         session.close()
-                        if len(job) == 0:
+                        if len(jobs) == 0:
                             send_d = {"data": "你没有配置策略任务", "type": "text"}
                             __send_reply(msg.fromid, json.dumps(send_d))
+                            print("无任务")
                             continue
 
                         # 处理任务
 
-                        for job in jbos:
+                        for job in jobs:
                             job.toid = msg.fromid
                             StockAnalyzeTask.process_job(job)
 
                     else:
-                        res = tuling(a_val, msg.frommemberwxid)
+                        res = tuling(a_val, msg.fromid + msg.frommemberwxid)
                         if res["code"] == 200:
                             reply = res["newslist"][0]["reply"]
                             send_d = {"data": reply, "type": "text"}
                             __send_reply(msg.fromid, json.dumps(send_d))
                         else:
                             print(res)
+
 
         except BaseException as e:
             logging.error('处理 process_message:id:%s content:%s' % (msg.id, msg.content), e)
@@ -160,7 +162,13 @@ def __process_mt_message(wx_inst):
 
 
 def main():
-    print("@Aaaaa? 1".replace("?", "").split("@Aaaaa"))
+    tmplist = "@Aaaaa 1".replace("?", "").split("@Aaaaa")
+    print(tmplist)
+    strlist = [i for i in tmplist if i.strip() != '']
+    print(strlist)
+    a_val = strlist[0].strip()
+    print(a_val)
+    print("@Aaaaa 1".find("@Aaaaa"))
 
 
 # __process_mo_message("we23232")
