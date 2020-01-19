@@ -80,39 +80,51 @@ def __process_mo_message(wx_inst):
     for msg in msglist:
         try:
             MessageUtils.update_message_state(msg.id, 1)
-            if len(msg.content) > 0 and msg.content[0] == "@":
-                strlist = msg.content.split('?')
-                if len(strlist) > 1:
-                    a_name = strlist[0].strip()
-                    a_val = strlist[1].strip()
-                    if a_name == "@" + Config.mywx_nickname:
-                        if a_val == "1":
-                            session = DbUtils.get_session()
-                            jbos = session.query(ModelUtils.get_model("strategy_conf", DbUtils.get_engine())) \
-                                .filter_by(createid=msg.frommemberwxid).all()
-                            session.close()
-                            for job in jbos:
-                                job.toid = msg.fromid
-                                StockAnalyzeTask.process_job(job)
+            a_name = "@" + Config.mywx_nickname
+            if len(msg.content) > 0 and msg.content.find(a_name) >= 0:
+                tmplist = msg.content.replace("?", "").split(a_name)
+                strlist = [i for i in tmplist if i.strip() != '']
+                if len(strlist) >= 1:
+                    # a_name = strlist[0].strip()
+                    a_val = strlist[0].strip()
+                    if a_val == "1":
+                        session = DbUtils.get_session()
+                        jbos = session.query(ModelUtils.get_model("strategy_conf", DbUtils.get_engine())) \
+                            .filter_by(createid=msg.frommemberwxid).all()
+                        session.close()
+                        if len(job) == 0:
+                            send_d = {"data": "你没有配置策略任务", "type": "text"}
+                            __send_reply(msg.fromid, json.dumps(send_d))
+                            continue
 
-                        elif a_name == "@" + Config.mywx_nickname:
-                            res = tuling(a_val, msg.frommemberwxid)
-                            if res["code"] == 200:
-                                reply = res["newslist"][0]["reply"]
-                                send_d = {"data": reply, "type": "text"}
+                        # 处理任务
 
-                                MessageUtils.add_message(
-                                    Message(fromid=Config.mywx_id, fromname=Config.mywx_nickname,
-                                            toid=msg.fromid, toname=""
-                                            , content=json.dumps(send_d),
-                                            createtime=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                                            , state=0, sendorrecv=1, msgtype="msg::chatroom")
-                                )
-                            else:
-                                print(res)
+                        for job in jbos:
+                            job.toid = msg.fromid
+                            StockAnalyzeTask.process_job(job)
+
+                    else:
+                        res = tuling(a_val, msg.frommemberwxid)
+                        if res["code"] == 200:
+                            reply = res["newslist"][0]["reply"]
+                            send_d = {"data": reply, "type": "text"}
+                            __send_reply(msg.fromid, json.dumps(send_d))
+                        else:
+                            print(res)
 
         except BaseException as e:
             logging.error('处理 process_message:id:%s content:%s' % (msg.id, msg.content), e)
+
+
+def __send_reply(toid, reply):
+    send_d = {"data": reply, "type": "text"}
+    MessageUtils.add_message(
+        Message(fromid=Config.mywx_id, fromname=Config.mywx_nickname,
+                toid=toid, toname=""
+                , content=json.dumps(send_d),
+                createtime=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                , state=0, sendorrecv=1, msgtype="msg::chatroom")
+    )
 
 
 # 调用图灵的机器人
@@ -148,11 +160,14 @@ def __process_mt_message(wx_inst):
 
 
 def main():
-    # __process_mo_message("we23232")
-    res = tuling("大盘指数", "dd")
-    print(res)
-    print(res["code"])
-    print(res["newslist"][0]["reply"])
+    print("@Aaaaa? 1".replace("?", "").split("@Aaaaa"))
+
+
+# __process_mo_message("we23232")
+# res = tuling("大盘指数", "dd")
+# print(res)
+# print(res["code"])
+# print(res["newslist"][0]["reply"])
 
 
 if __name__ == "__main__": main()
