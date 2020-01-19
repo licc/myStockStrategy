@@ -93,8 +93,7 @@ def __process_mo_message(wx_inst):
                             .filter_by(createid=msg.frommemberwxid).all()
                         session.close()
                         if len(jobs) == 0:
-                            send_d = {"data": "你没有配置策略任务", "type": "text"}
-                            __send_reply(msg.fromid, json.dumps(send_d))
+                            __send_reply(msg.fromid, "你没有配置策略任务")
                             print("无任务")
                             continue
 
