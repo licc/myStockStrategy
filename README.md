@@ -1,2 +1,2 @@
-# myStockStrategy
-#Python 练手
+# python股票策略预警
+# 微信机器人外挂消息通知
